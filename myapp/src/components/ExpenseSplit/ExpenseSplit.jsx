@@ -32,34 +32,46 @@ const ExpenseSplit = () => {
   };
 
   const calculateDivision = () => {
-    const total = users.reduce((sum, user) => sum + user.amount, 0);
-    const perPerson = total / users.length;
+
+    let userLength = users.length
+    console.log("users",users)
+    console.log(userLength);
     
-    const balances = users.map((user) => ({
-      name: user.name,
-      balance: user.amount - perPerson,
+
+    const individualShares = users.map((user) => ({
+        name: user.name,
+        share : user.amount/userLength,
     }));
+    
+    const Payments =[]
 
-    const payments = [];
-    let debtors = balances.filter(b => b.balance < 0).sort((a, b) => a.balance - b.balance);
-    let creditors = balances.filter(b => b.balance > 0).sort((a, b) => b.balance - a.balance);
+    const results = individualShares.map((user,i) => {
+        return {
+            name:user.name,
+            updatedAmounts : individualShares.map((otherUsers) => ({
+                name:otherUsers.name,
+                amount: (otherUsers.share - user.share > 0 ? (otherUsers.share - user.share) : 0)
+            }))
+        };
+    });
 
-    while (debtors.length > 0 && creditors.length > 0) {
-      let debtor = debtors[0];
-      let creditor = creditors[0];
-      let transfer = Math.min(-debtor.balance, creditor.balance);
+    results.forEach(obj => {
+        obj.updatedAmounts.forEach(person => {
+            if(person.amount > 0){
+              Payments.push(`${obj.name} Should give $${Math.round(person.amount)} to ${person.name}`);
+            }
+        });
+    });
 
-      payments.push(`${debtor.name} pays ${creditor.name} $${transfer.toFixed(2)}`);
-      debtor.balance += transfer;
-      creditor.balance -= transfer;
+    console.log(results);
 
-      if (debtor.balance === 0) debtors.shift();
-      if (creditor.balance === 0) creditors.shift();
-    }
-    if(payments.length === 0)
-        setResult(["NO ONE PAYS NO ONE"]);
+    console.log("Pa",Payments);
+
+    if(Payments.length === 0)
+      setResult(["All Expenses are balanced... Thank you"]);
     else
-        setResult(payments);
+      setResult(Payments);
+
   };
 
   return (
