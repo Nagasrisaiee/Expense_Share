@@ -98,7 +98,7 @@ const ExpenseSplit = () => {
           <li key={index}>{user.name}: ${user.amount.toFixed(2)}</li>
         ))}
       </ul>
-      <button onClick={calculateDivision}>Calculate Division</button>
+      <button onClick={calculateDivision}>My Trail Balance</button>
       {result && (
         <div className="result-box">
           <h3>Final Settlement:</h3>
